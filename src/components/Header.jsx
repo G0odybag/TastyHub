@@ -1,215 +1,72 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiSearch, FiHeart, FiUser, FiLogOut } from 'react-icons/fi'
-import { useAuth } from '../context/AuthContext'
-import SearchBar from './SearchBar'
-import { useState } from 'react'
+// src/components/Header.jsx
+import { Link } from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import AuthModal from './AuthModal';
+import { FaUser, FaHeart, FaSignOutAlt, FaSearch } from 'react-icons/fa';
 
 const Header = () => {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-  const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
+  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleLogout = () => {
-    logout()
-    setShowMobileMenu(false)
-  }
-
-  const handleSearch = (query) => {
-    navigate(`/recipes?search=${query}`)
-    setShowSearch(false)
-    setShowMobileMenu(false)
-  }
+    logout();
+  };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-10">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="text-2xl font-serif font-bold text-primary">
-            TastyHub
+    <header className="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md">
+      <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between">
+        <Link to="/" className="flex items-center mb-4 md:mb-0">
+          <h1 className="text-3xl font-bold">TastyHubb</h1>
+        </Link>
+
+        <div className="relative w-full md:w-1/3 mb-4 md:mb-0">
+          <input
+            type="text"
+            placeholder="Search recipes..."
+            className="w-full py-2 px-4 pr-10 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-300"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Link 
+            to={`/?search=${searchTerm}`}
+            className="absolute right-3 top-2.5 text-gray-500 hover:text-orange-500"
+          >
+            <FaSearch />
           </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `hover:text-primary ${isActive ? 'text-primary font-medium' : 'text-gray-700'}`
-              }
-            >
-              Home
-            </NavLink>
-            <NavLink
-              to="/recipes"
-              className={({ isActive }) =>
-                `hover:text-primary ${isActive ? 'text-primary font-medium' : 'text-gray-700'}`
-              }
-            >
-              Recipes
-            </NavLink>
-
-            {user ? (
-              <>
-                <NavLink
-                  to="/favorites"
-                  className={({ isActive }) =>
-                    `hover:text-primary ${isActive ? 'text-primary font-medium' : 'text-gray-700'}`
-                  }
-                >
-                  <div className="flex items-center">
-                    <FiHeart className="mr-1" />
-                    Favorites
-                  </div>
-                </NavLink>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-white">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="text-gray-700">{user.name}</span>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="text-gray-500 hover:text-primary"
-                  >
-                    <FiLogOut />
-                  </button>
-                </div>
-              </>
-            ) : (
-              <NavLink
-                to="/login"
-                className={({ isActive }) =>
-                  `hover:text-primary ${isActive ? 'text-primary font-medium' : 'text-gray-700'}`
-                }
-              >
-                <div className="flex items-center">
-                  <FiUser className="mr-1" />
-                  Login
-                </div>
-              </NavLink>
-            )}
-          </nav>
-
-          {/* Mobile menu button */}
-          <div className="flex md:hidden items-center space-x-4">
-            <button
-              onClick={() => setShowSearch(!showSearch)}
-              className="text-gray-700 hover:text-primary"
-            >
-              <FiSearch size={20} />
-            </button>
-            <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="text-gray-700 hover:text-primary"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
         </div>
 
-        {/* Mobile Search */}
-        {showSearch && (
-          <div className="mt-4 md:hidden">
-            <SearchBar onSearch={handleSearch} />
-          </div>
-        )}
+        <nav className="flex items-center space-x-6">
+          {isAuthenticated ? (
+            <>
+              <Link to="/favorites" className="flex items-center hover:text-orange-200">
+                <FaHeart className="mr-1" /> Favorites
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center hover:text-orange-200"
+              >
+                <FaSignOutAlt className="mr-1" /> Logout
+              </button>
+              <span className="flex items-center">
+                <FaUser className="mr-1" /> {user?.username}
+              </span>
+            </>
+          ) : (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-white text-orange-500 px-4 py-1 rounded-full hover:bg-orange-100 transition"
+            >
+              Login / Register
+            </button>
+          )}
+        </nav>
       </div>
 
-      {/* Mobile Menu */}
-      {showMobileMenu && (
-        <div className="md:hidden bg-white border-t">
-          <div className="container mx-auto px-4 py-3">
-            <nav className="flex flex-col space-y-3">
-              <NavLink
-                to="/"
-                onClick={() => setShowMobileMenu(false)}
-                className={({ isActive }) =>
-                  `py-2 hover:text-primary ${
-                    isActive ? 'text-primary font-medium' : 'text-gray-700'
-                  }`
-                }
-              >
-                Home
-              </NavLink>
-              <NavLink
-                to="/recipes"
-                onClick={() => setShowMobileMenu(false)}
-                className={({ isActive }) =>
-                  `py-2 hover:text-primary ${
-                    isActive ? 'text-primary font-medium' : 'text-gray-700'
-                  }`
-                }
-              >
-                Recipes
-              </NavLink>
-
-              {user ? (
-                <>
-                  <NavLink
-                    to="/favorites"
-                    onClick={() => setShowMobileMenu(false)}
-                    className={({ isActive }) =>
-                      `py-2 hover:text-primary ${
-                        isActive ? 'text-primary font-medium' : 'text-gray-700'
-                      }`
-                    }
-                  >
-                    <div className="flex items-center">
-                      <FiHeart className="mr-2" />
-                      Favorites
-                    </div>
-                  </NavLink>
-                  <div className="flex items-center justify-between py-2">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-white">
-                        {user.name.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="text-gray-700">{user.name}</span>
-                    </div>
-                    <button
-                      onClick={handleLogout}
-                      className="text-gray-500 hover:text-primary"
-                    >
-                      <FiLogOut />
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <NavLink
-                  to="/login"
-                  onClick={() => setShowMobileMenu(false)}
-                  className={({ isActive }) =>
-                    `py-2 hover:text-primary ${
-                      isActive ? 'text-primary font-medium' : 'text-gray-700'
-                    }`
-                  }
-                >
-                  <div className="flex items-center">
-                    <FiUser className="mr-2" />
-                    Login
-                  </div>
-                </NavLink>
-              )}
-            </nav>
-          </div>
-        </div>
-      )}
+      <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

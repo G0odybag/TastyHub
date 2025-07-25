@@ -1,60 +1,36 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+// src/context/AuthContext.jsx
+import { createContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext()
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check for user in localStorage on initial load
-    const storedUser = localStorage.getItem('tastyhub_user')
+    const storedUser = localStorage.getItem('tastyhubb_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser))
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
     }
-    setLoading(false)
-  }, [])
+  }, []);
 
   const login = (userData) => {
-    setUser(userData)
-    localStorage.setItem('tastyhub_user', JSON.stringify(userData))
-  }
-
-  const register = (userData) => {
-    setUser(userData)
-    localStorage.setItem('tastyhub_user', JSON.stringify(userData))
-  }
+    setUser(userData);
+    setIsAuthenticated(true);
+    localStorage.setItem('tastyhubb_user', JSON.stringify(userData));
+  };
 
   const logout = () => {
-    setUser(null)
-    localStorage.removeItem('tastyhub_user')
-    navigate('/')
-  }
-
-  const updateFavorites = (favorites) => {
-    const updatedUser = { ...user, favorites }
-    setUser(updatedUser)
-    localStorage.setItem('tastyhub_user', JSON.stringify(updatedUser))
-  }
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('tastyhubb_user');
+    localStorage.removeItem('tastyhubb_favorites');
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        updateFavorites,
-      }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
-  )
-}
-
-export const useAuth = () => {
-  return useContext(AuthContext)
-}
+  );
+};

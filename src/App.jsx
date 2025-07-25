@@ -1,37 +1,31 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout'
-import Home from './pages/Home'
-import Recipes from './pages/Recipes'
-import RecipeDetail from './pages/RecipeDetail'
-import Favorites from './pages/Favourites'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import NotFound from './pages/NotFound'
-import { AuthProvider } from './context/AuthContext'
-import ProtectedRoute from './components/ProtectedRoute'
+// src/App.js
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { RecipeProvider } from './context/RecipeContext';
+import Header from './components/Header';
+import Home from './pages/Home';
+import RecipePage from './pages/RecipePage';
+import Favorites from './pages/Favorites';
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="recipes" element={<Recipes />} />
-            <Route path="recipes/:id" element={<RecipeDetail />} />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-            <Route path="*" element={<NotFound />} />
-            
-            {/* Protected routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="favorites" element={<Favorites />} />
-            </Route>
-          </Route>
-        </Routes>
+        <RecipeProvider>
+          <div className="min-h-screen bg-gray-50">
+            <Header />
+            <main className="container mx-auto px-4 py-8">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/recipe/:id" element={<RecipePage />} />
+                <Route path="/favorites" element={<Favorites />} />
+              </Routes>
+            </main>
+          </div>
+        </RecipeProvider>
       </AuthProvider>
-    </BrowserRouter>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;

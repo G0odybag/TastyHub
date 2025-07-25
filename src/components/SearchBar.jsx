@@ -1,42 +1,54 @@
-import { useState } from 'react'
-import { FiSearch, FiX } from 'react-icons/fi'
+// src/components/SearchBar.jsx
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaSearch, FaTimes } from 'react-icons/fa';
 
-const SearchBar = ({ onSearch, className = '' }) => {
-  const [query, setQuery] = useState('')
+const SearchBar = ({ initialValue = '' }) => {
+  const [searchTerm, setSearchTerm] = useState(initialValue);
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    if (query.trim()) {
-      onSearch(query.trim())
-      setQuery('')
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/?search=${encodeURIComponent(searchTerm)}`);
     }
-  }
+  };
 
   const clearSearch = () => {
-    setQuery('')
-  }
+    setSearchTerm('');
+    navigate('/');
+  };
 
   return (
-    <form onSubmit={handleSubmit} className={`relative ${className}`}>
-      <input
-        type="text"
-        placeholder="Search recipes..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="w-full py-2 pl-10 pr-8 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-      />
-      <FiSearch className="absolute left-3 top-3 text-black-400" />
-      {query && (
+    <form onSubmit={handleSubmit} className="relative w-full max-w-xl mx-auto">
+      <div className="relative flex items-center">
+        <input
+          type="text"
+          placeholder="Search recipes by name, ingredient..."
+          className="w-full py-2 px-4 pr-10 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {searchTerm && (
+          <button
+            type="button"
+            onClick={clearSearch}
+            className="absolute right-10 text-gray-500 hover:text-gray-700"
+            aria-label="Clear search"
+          >
+            <FaTimes />
+          </button>
+        )}
         <button
-          type="button"
-          onClick={clearSearch}
-          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+          type="submit"
+          className="absolute right-2 text-orange-500 hover:text-orange-600"
+          aria-label="Search"
         >
-          <FiX />
+          <FaSearch />
         </button>
-      )}
+      </div>
     </form>
-  )
-}
+  );
+};
 
-export default SearchBar
+export default SearchBar;
