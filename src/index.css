@@ -13,3 +13,42 @@ body {
 .prose p {
   margin-bottom: 1rem;
 }
+
+/* Custom slick carousel styles */
+.slick-slide {
+  padding: 0 10px;
+}
+
+.slick-list {
+  margin: 0 -10px;
+}
+
+.slick-dots li button:before {
+  color: #FF6B35; /* Your orange-500 color */
+}
+
+.slick-dots li.slick-active button:before {
+  color: #FF6B35; /* Active dot color */
+}
+
+/* Custom dot size if needed */
+.slick-dots li button:before {
+  font-size: 10px;
+}
+
+/* Optional: hover effects */
+.slick-arrow:hover {
+  opacity: 0.8;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.prose {
+  max-width: 100%;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+}

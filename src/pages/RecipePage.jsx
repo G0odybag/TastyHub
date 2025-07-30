@@ -1,5 +1,5 @@
 // src/pages/RecipePage.jsx
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { RecipeContext } from '../context/RecipeContext';
 import { AuthContext } from '../context/AuthContext';

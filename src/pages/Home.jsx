@@ -11,6 +11,7 @@ const Home = () => {
   const searchTerm = searchParams.get('search') || '';
   const { recipes, setRecipes, isLoading, setIsLoading } = useContext(RecipeContext);
   const [error, setError] = useState(null);
+  const [featuredRecipes, setFeaturedRecipes] = useState([]);
 
   useEffect(() => {
     const loadRecipes = async () => {
@@ -19,10 +20,16 @@ const Home = () => {
         let data;
         if (searchTerm) {
           data = await fetchRecipes(searchTerm);
+          setRecipes(data);
         } else {
+          // Load 3 random recipes for featured section
+          const randomData = await fetchRandomRecipes();
+          setFeaturedRecipes(randomData.slice(0, 3));
+          
+          // Load more recipes for the main list
           data = await fetchRandomRecipes();
+          setRecipes(data);
         }
-        setRecipes(data);
         setIsLoading(false);
       } catch (err) {
         setError(err.message);
@@ -46,10 +53,28 @@ const Home = () => {
   }
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        {searchTerm ? `Search Results for "${searchTerm}"` : 'Featured Recipes'}
-      </h2>
+    <div className="container mx-auto px-4">
+      {!searchTerm && (
+        <>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">Featured Recipes</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {featuredRecipes.map((recipe) => (
+              <RecipeCard 
+                key={`featured-${recipe.idMeal}`} 
+                recipe={recipe} 
+                featured={true}
+              />
+            ))}
+          </div>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">More Recipes</h2>
+        </>
+      )}
+
+      {searchTerm && (
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          Search Results for "{searchTerm}"
+        </h2>
+      )}
 
       {recipes.length === 0 ? (
         <div className="text-center py-10">
